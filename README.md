@@ -94,7 +94,7 @@ A really helpful resource for doing this project and creating smooth trajectorie
 
 ## Implementation
 
-In order to achieve the goel of this project quickly, I utilized the additional header file [spline.h](./src/spline.h) from [this page](http://kluge.in-chemnitz.de/opensource/spline/), while the rest of the implemetation was in [main.cpp](./src/main.cpp). Meanwhile, taking advatage of that Udacity provided a number of helper functions in [helpers.h](./src/helpers.h), we can finish the task even easier.
+In order to achieve the goel of this project quickly, I utilized the additional header file [spline.h](./src/spline.h) from [this page](http://kluge.in-chemnitz.de/opensource/spline/), and followed the steps in the project QA video, while the rest of the implemetation was in [main.cpp](./src/main.cpp). Meanwhile, taking advatage of that Udacity provided a number of helper functions in [helpers.h](./src/helpers.h), we can finish the task even easier.
 
 My implementation could be divided into two steps:
 1. Prediction and decision based on the current status and the environment sensed by the sensor
