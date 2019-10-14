@@ -92,54 +92,19 @@ A really helpful resource for doing this project and creating smooth trajectorie
     git checkout e94b6e1
     ```
 
-## Editor Settings
+## Implementation
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+In order to achieve the goel of this project quickly, I utilized the additional header file [spline.h](./src/spline.h) from [this page](http://kluge.in-chemnitz.de/opensource/spline/), while the rest of the implemetation was in [main.cpp](./src/main.cpp). Meanwhile, taking advatage of that Udacity provided a number of helper functions in [helpers.h](./src/helpers.h), we can finish the task even easier.
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
-
-## Code Style
-
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
-
-## Project Instructions and Rubric
-
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+My implementation could be divided into two steps:
+1. Prediction and decision based on the current status and the environment sensed by the sensor
+2. Generation of the trajectory according to the decision made in the previous step
 
 
-## Call for IDE Profiles Pull Requests
+### 1. Prediction and Decision
 
-Help your fellow students!
+First, the sensor fusion data would be analyzed to determine wheather there're vehicles around, especially those within a proposed gap of 30 meters front, and 2 sides. The information would affect that if we need to slow down or change lane if too close the the front car or there's too crowded to have lane-changing option. While our objective was to finish the lap as quick as possible, while keeping stable and safe, so maintaining the speed of the vehicle by changing lane was prefered in my approach. However, if it's too many cars around and it's dangerous to change lane, we would slightly slow down the vehicle and try to follow the car in the front. On the other hand, if there's no potential risk, the ego-vehicle should keep in the middle lane to have more flexibility.
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to ensure
-that students don't feel pressured to use one IDE or another.
+### 2. Trajectory Generation
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
+The second step determines the trajectory for our ego-vehicle based on the decisions made above, the vehicle's position, and the historical path points. The last two points in the already-covered terrain are computed. If the vehicle has not yet moved 60 meters, the vehicle's current position is used instead of the historical waypoints. Because splines are the method used to generate the trajectory, the computed waypoints are transformed with 3 points (30m, 60m, 90m) set in the front. The result would be a smooth trajectory in 2D space while the acceleration and velocity were both taken into account. In the end, 50 waypoints are generated, including the unused points in the previous section. Since the length of the generated trajectory was not fixed, once the vehicle has assumed the correct position, the rest of the waypoints were generated to keep the vehicle in the target lane.
