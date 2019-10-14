@@ -96,9 +96,13 @@ int main() {
 
           if (prev_size > 0) car_s = end_path_s;
 
+          double std_acc = 0.224;
+          double max_speed = 49.5;
+
           bool front_close = false;
           bool left_close = false;
           bool right_close = false;
+          double front_speed = max_speed;
 
           // Find ref_v to use, see if car is in lane
           for (int i = 0; i < sensor_fusion.size(); i++) {
@@ -127,6 +131,7 @@ int main() {
             // Identify whether the car is ahead, to the left, or to the right
             if (check_lane == lane) {
               front_close |= (check_s > car_s) && ((check_s - car_s) < proposed_gap);
+              front_speed = front_close ? std::min(check_speed, front_speed) : front_speed;
             } else if (check_lane == lane + 1) {
               right_close |= (abs(car_s - check_s) < proposed_gap);
             } else if (check_lane == lane - 1) {
@@ -135,18 +140,16 @@ int main() {
           }
 
           // Modulate the speed to avoid collisions. Change lanes if it is safe to do so (nobody to the side)
-          double acc = 0.224;
-          double max_speed = 49.5;
           if (front_close) {
             if (!right_close && lane < 2) lane++;
             else if (!left_close && lane > 0) lane--;
-            else ref_vel -= acc;
+            else ref_vel -= std::min(std_acc, (ref_vel - front_speed) / 50);
           }
           else {
             if (lane != 1) {
               if ((lane == 2 && !left_close) || (lane == 0 && !right_close)) lane = 1;
             }
-            if (ref_vel < max_speed) ref_vel += acc;
+            if (ref_vel < max_speed) ref_vel += std_acc;
           }
 
           // Create a list of widely spaced (x,y) waypoints, evenly spaced at 30m
